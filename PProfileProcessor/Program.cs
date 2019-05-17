@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace PProfileProcessor
 {
@@ -18,9 +19,27 @@ namespace PProfileProcessor
 
             fileProcessor.CleanDirectory();
 
-            Console.WriteLine("Press enter to quit.");
-            Console.ReadKey();
+            using (var inputFileWatcher = new FileSystemWatcher(initialDirectory))
+            {
+                inputFileWatcher.IncludeSubdirectories = false;
+                inputFileWatcher.Filter = "*.PublishSettings";
+                inputFileWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Attributes;
 
+                inputFileWatcher.Renamed += ProfileCreated;
+
+                inputFileWatcher.EnableRaisingEvents = true;
+                 
+                Console.WriteLine("Press enter to quit.");
+                Console.ReadKey();
+            }
+
+            
+
+        }
+
+        private static void ProfileCreated(object sender, FileSystemEventArgs e)
+        {
+            WriteLine($"*** Profile created: {e.Name} - type: {e.ChangeType}");
         }
     }
 }
