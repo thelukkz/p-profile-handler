@@ -17,7 +17,7 @@ namespace PProfileProcessor
 
             var fileProcessor = new FileProcessor(initialDirectory, archiveDirectory);
 
-            fileProcessor.CleanDirectory();
+            //fileProcessor.CleanDirectory();
 
             using (var inputFileWatcher = new FileSystemWatcher(initialDirectory))
             {
@@ -25,7 +25,7 @@ namespace PProfileProcessor
                 inputFileWatcher.Filter = "*.PublishSettings";
                 inputFileWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Attributes;
 
-                inputFileWatcher.Renamed += ProfileCreated;
+                inputFileWatcher.Renamed += ReadProfile;
 
                 inputFileWatcher.EnableRaisingEvents = true;
                  
@@ -37,9 +37,56 @@ namespace PProfileProcessor
 
         }
 
-        private static void ProfileCreated(object sender, FileSystemEventArgs e)
+        private static void ReadProfile(object sender, FileSystemEventArgs e)
         {
-            WriteLine($"*** Profile created: {e.Name} - type: {e.ChangeType}");
+            OutputWriter ow = new OutputWriter();
+            string content = File.ReadAllText(e.FullPath);
+
+            var title = GetValue(content, "profileName");
+            var url = GetValue(content, "destinationAppUrl");
+            var connectionString = GetValue(content, " connectionString");
+
+
+            var ftp = GetValue(StartFrom(content, "FTP"), "publishUrl");
+            var ftpUser = GetValue(StartFrom(content, "FTP"), "userName");
+            var ftpPassword = GetValue(StartFrom(content, "FTP"), "userPWD");
+
+            WriteLine($"####################################");
+
+            ow.WithKey("profileName").WithValue(title).WriteOutput();
+            ow.WithKey("url").WithValue(url).WriteOutput();
+
+
+            WriteLine($"> ----------");
+
+            ow.WithKey("connectionString").WithValue(connectionString).WriteOutput();
+
+            WriteLine($"> ----------");
+
+            ow.WithKey("FTP").WithValue(ftp).WriteOutput();
+            ow.WithKey("user").WithValue(ftpUser).WriteOutput();
+            ow.WithKey("pwd").WithValue(ftpPassword).WriteOutput();
+
+        }
+
+        private static string GetValue(string profile, string key)
+        {
+            int keyPositionIndex = profile.IndexOf($"{key}=\"");
+            string profileFromKeyIndex = profile.Substring(keyPositionIndex);
+            int keyLength = profileFromKeyIndex.IndexOf("\"") + 1;
+
+            int valuePositionIndex = keyPositionIndex + keyLength;
+
+            string tempFile = profile.Substring(valuePositionIndex);
+            int valueLength = tempFile.IndexOf("\"");
+
+            return profile.Substring(valuePositionIndex, valueLength);
+        }
+
+        private static string StartFrom(string profile, string key)
+        {
+            int keyPositionIndex = profile.IndexOf(key);
+            return profile.Substring(keyPositionIndex);
         }
     }
 }
