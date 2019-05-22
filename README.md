@@ -6,12 +6,12 @@ This is training project just to train work with files, and make it easier to do
 ### Guide
 
 1. Run program, listener will be activated
-   ![Listening](/docs/images/listening.png)
+   ![](docs/images/listening.png)
 
 2. Go to azure portal and click **Get publish profile**
 3. Download file to your **/user/Downloads** folder
 4. When publish profile will be downloaded you will see result
-   ![Listening](/docs/images/reading.png)
+   ![](docs/images/reading.png)
 
 5. Copy credentials you need
 6. Downladed profile will be archived in **/user/Downloads/00_PublishProfiles** directory
