@@ -12,12 +12,11 @@ namespace PProfileProcessor
     {
         static void Main(string[] args)
         {
-            string initialDirectory = @"C:\Users\pro-lqs\Downloads";
+            string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string initialDirectory = $"{userProfilePath}\\Downloads";
             string archiveDirectory = "00_PublishProfiles";
 
             var fileProcessor = new FileProcessor(initialDirectory, archiveDirectory);
-
-            //fileProcessor.CleanDirectory();
 
             using (var inputFileWatcher = new FileSystemWatcher(initialDirectory))
             {
@@ -28,13 +27,11 @@ namespace PProfileProcessor
                 inputFileWatcher.Renamed += ReadProfile;
 
                 inputFileWatcher.EnableRaisingEvents = true;
-                 
-                Console.WriteLine("Press enter to quit.");
+
+                Console.WriteLine("Listening... press enter to quit.");
                 Console.ReadKey();
             }
-
-            
-
+            fileProcessor.CleanDirectory();         
         }
 
         private static void ReadProfile(object sender, FileSystemEventArgs e)
@@ -57,11 +54,11 @@ namespace PProfileProcessor
             ow.WithKey("url").WithValue(url).WriteOutput();
 
 
-            WriteLine($"> ----------");
+            WriteLine($"> ----- DB -----");
 
             ow.WithKey("connectionString").WithValue(connectionString).WriteOutput();
 
-            WriteLine($"> ----------");
+            WriteLine($"> ----- FTP -----");
 
             ow.WithKey("FTP").WithValue(ftp).WriteOutput();
             ow.WithKey("user").WithValue(ftpUser).WriteOutput();

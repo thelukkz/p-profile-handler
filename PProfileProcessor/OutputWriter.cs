@@ -18,7 +18,7 @@ namespace PProfileProcessor
 
         public OutputWriter WithKey(string key)
         {
-            _key = $"> {key} : ";
+            _key = $"> {key} :" + "\t";
             return this;
         }
 
